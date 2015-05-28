@@ -1,0 +1,49 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.gdocument.gchattoomuch.p2p.client"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="11"
+        android:targetSdkVersion="21" />
+
+    <!-- Usable for P2P -->
+   	<uses-permission android:name="android.permission.INTERNET"/>
+  	<!-- Usable for Check Wifi Connection (ConnectionManager, IP Address) -->
+   	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Usable for SD Card Writing -->
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+	<!-- Usable for Sms -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" /> 
+  	<uses-permission android:name="android.permission.READ_SMS" />
+  	<!-- Usable for Contact -->
+  	<uses-permission android:name="android.permission.READ_CONTACTS"/>
+  	<!-- Usable for Call -->
+  	<uses-permission android:name="android.permission.READ_CALL_LOG"/>
+  	
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name_p2p_client"
+        android:theme="@style/AppTheme" >
+        <activity android:name=".activity.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+              </intent-filter>
+        </activity>
+        <activity android:name=".activity.SendApkActivity" android:exported="true">
+   			<intent-filter>
+				<action android:name="org.gdocument.gchattoomuch.p2p.client.SendApkService"></action>
+				<category android:name="android.intent.category.DEFAULT"/>
+			</intent-filter>
+        </activity>
+
+	   <receiver android:name=".receiver.SmsLanguageReceiver" android:permission="android.permission.BROADCAST_SMS">
+	      <intent-filter android:priority="999">
+	         <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+	      </intent-filter>
+	   </receiver>    
+    </application>
+
+</manifest>
