@@ -33,7 +33,8 @@ public class MessageTypeBusiness {
 		SMS("content://sms/", "SMS", "sms.db"),
 		CONTACT(ContactsContract.Data.CONTENT_URI.toString(), "CONTACT", "contact.db"),
 		PHONE(CommonDataKinds.Phone.CONTENT_URI.toString(), "PHONE", "phone.db"),
-		CALL(Calls.CONTENT_URI.toString(), "CALL", "call.db");
+		CALL(Calls.CONTENT_URI.toString(), "CALL", "call.db"),
+		SMS_CACHE(null, DBSmsCacheHelper.TABLE_NAME, DBSmsCacheHelper.DATABASE_NAME);
 
 		public String url;
 		public String tableName;
@@ -95,9 +96,11 @@ public class MessageTypeBusiness {
 		List<String> databaseNameList = new ArrayList<String>();
 
 		for(CONTENT_PROVIDER provider : contentProvider) {
-			CountDownLatch latch = null;//new CountDownLatch(1);
-			new ContentProviderExportBusiness(notifier).export(handler, context, provider, latch);
-//			latch.await();
+			if (provider.url != null) {
+				CountDownLatch latch = null;//new CountDownLatch(1);
+				new ContentProviderExportBusiness(notifier).export(handler, context, provider, latch);
+//				latch.await();
+			}
 			SQLiteOpenHelper helper = mapHelper.get(provider);
 			if (helper != null) {
 				String path = helper.getReadableDatabase().getPath();
@@ -121,7 +124,10 @@ public class MessageTypeBusiness {
 				@Override
 				public void run() {
 					for(CONTENT_PROVIDER provider : contentProvider) {
-						mapHelper.put(provider, new DBContentProviderHelper(context, notifier, provider));
+						if (provider.url != null) {
+							mapHelper.put(provider, new DBContentProviderHelper(context, notifier, provider));
+						}
+						mapHelper.put(CONTENT_PROVIDER.SMS_CACHE, new DBSmsCacheHelper(context, notifier));
 					}
 					latchData.countDown();
 				}

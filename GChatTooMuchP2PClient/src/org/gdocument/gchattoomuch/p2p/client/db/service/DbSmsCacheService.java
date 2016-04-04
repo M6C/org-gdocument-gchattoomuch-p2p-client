@@ -35,4 +35,15 @@ public class DbSmsCacheService extends GenericService<Sms> {
     		dbDataSource.close();
     	}
 	}
+
+	public void backup(int oldVersion) {
+    	try {
+    		dbDataSource.open();
+    		// Backup database
+			dbDataSource.backupDbToSdcard(oldVersion);
+    	}
+    	finally {
+    		dbDataSource.close();
+    	}
+	}
 }

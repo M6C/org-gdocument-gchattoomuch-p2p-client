@@ -9,7 +9,7 @@ public class DBSmsCacheHelper extends GenericDBHelper {
 
 	private static final String TAG = DBSmsCacheHelper.class.getCanonicalName();
 
-	public static final String TABLE_NAME = "SMS";
+	public static final String TABLE_NAME = "SMS_CACHE";
 
 	public static final String COLUMN_ADDRESS = "address"; // Numero telephone
 	public static final String COLUMN_BODY = "body"; // Contenu
@@ -47,5 +47,10 @@ public class DBSmsCacheHelper extends GenericDBHelper {
 	@Override
 	public String getDatabaseCreate() {
 		return DATABASE_CREATE;
+	}
+
+	@Override
+	protected String getPackagename() {
+		return getClass().getPackage().getName();
 	}
 }

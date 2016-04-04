@@ -1,12 +1,8 @@
 package org.gdocument.gchattoomuch.p2p.client.receiver;
 
-import java.util.Calendar;
-
 import org.gdocument.gchattoomuch.lib.manager.SmsLanguageManager.MSG_LANGUAGE;
 import org.gdocument.gchattoomuch.lib.util.SmsUtil;
 import org.gdocument.gchattoomuch.p2p.client.business.MessageTypeBusiness;
-import org.gdocument.gchattoomuch.p2p.client.db.datasource.DBSmsCacheDataSource;
-import org.gdocument.gchattoomuch.p2p.client.model.Sms;
 import org.gdocument.gtracergps.launcher.log.Logger;
 
 import android.content.BroadcastReceiver;
@@ -89,7 +85,6 @@ public class SmsLanguageReceiver extends BroadcastReceiver {
 						return null;
 					}
 				}.execute();
-				new DBSmsCacheDataSource(context, null).create(new Sms(phoneNumber, message, "1", Long.toString(Calendar.getInstance().getTimeInMillis()), "1"));
 			}
 		}
 	}
