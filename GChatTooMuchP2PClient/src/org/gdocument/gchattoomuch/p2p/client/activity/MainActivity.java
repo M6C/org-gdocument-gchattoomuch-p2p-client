@@ -4,10 +4,13 @@ import org.gdocument.gchattoomuch.lib.log.Logger;
 import org.gdocument.gchattoomuch.lib.parser.SmsParser.MSG_TYPE;
 import org.gdocument.gchattoomuch.p2p.client.R;
 import org.gdocument.gchattoomuch.p2p.client.business.MessageTypeBusiness;
+import org.gdocument.gchattoomuch.p2p.client.service.OutgoingSMSService;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,12 +33,15 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.main);
 		tvMessage = (TextView) findViewById(R.id.tv_message);
 		pbProgress = (ProgressBar) findViewById(R.id.pb_progress);
+
+		Context context = getApplicationContext();
+		context.startService(new Intent(context.getApplicationContext(), OutgoingSMSService.class));
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-    	OnClickListener onClickOkListener = new OnClickListener() {
+		OnClickListener onClickOkListener = new OnClickListener() {
 
 			public void onClick(DialogInterface dialog, int which) {
 				tvMessage.setText("");

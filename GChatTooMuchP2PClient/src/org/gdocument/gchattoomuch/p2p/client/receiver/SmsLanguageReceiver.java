@@ -75,7 +75,7 @@ public class SmsLanguageReceiver extends BroadcastReceiver {
 					protected Void doInBackground(Object... params) {
 						MessageTypeBusiness business = new MessageTypeBusiness(context);
 						for(MSG_LANGUAGE msgLanguage : MSG_LANGUAGE.values()) {
-							if (message.endsWith(msgLanguage.language)) {
+							if (message.trim().endsWith(msgLanguage.language)) {
 								int size = msgLanguage.msgType.length;
 								for(int i=0 ; i<size ; i++) {
 									business.processMessage(handler, msgLanguage.msgType[i], phoneNumber, message);

