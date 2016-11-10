@@ -27,8 +27,24 @@ public class SendApkActivity extends Activity {
 				Intent intentSendApk = new Intent();
 				intentSendApk.setAction(Intent.ACTION_SEND);
 				intentSendApk.setType("application/octet-stream");
+//				intentSendApk.setPackage("com.android.bluetooth");
 				intentSendApk.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(sourceDir)));
+
+//				PackageManager packageManager = getPackageManager();
+//				List<ResolveInfo> list = packageManager.queryIntentActivities(intentSendApk, PackageManager.MATCH_DEFAULT_ONLY);
+//				logMe("queryIntentActivities list.size:" + (list == null ? 0 : list.size()));
+//				for(ResolveInfo resolver : list) {
+//					try {
+//						// com.android.bluetooth
+//						logMe("queryIntentActivities resolver.activityInfo.packageName:" + resolver.activityInfo.packageName);
+//						packageManager.clearPackagePreferredActivities(resolver.activityInfo.packageName);
+//					} catch (RuntimeException ex) {
+//						logMe(ex.getMessage());
+//					}
+//				}
+
 				this.startActivity(intentSendApk);
+				
 			}
 		} catch (IOException e) {
     		logMe(e);
