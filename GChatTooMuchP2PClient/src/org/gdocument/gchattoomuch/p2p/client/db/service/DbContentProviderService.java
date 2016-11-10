@@ -29,4 +29,15 @@ public class DbContentProviderService extends GenericService<ContentProviderData
     		dbDataSource.close();
     	}
 	}
+
+	public void recreateTable() {
+    	try {
+    		dbDataSource.open();
+    		// Delete in database
+			dbDataSource.recreateTable();
+    	}
+    	finally {
+    		dbDataSource.close();
+    	}
+	}
 }

@@ -50,7 +50,7 @@ public class ContentProviderExportBusiness {
 			protected Void doInBackground(Object... params) {
 				try {
 					latchData.await();
-					exportSmsInDb();
+					exportInDb();
 	
 					if (latch != null) {
 						latch.countDown();
@@ -65,12 +65,12 @@ public class ContentProviderExportBusiness {
 			protected void onPostExecute(Void result) {
 			};
 
-			private void exportSmsInDb() {
-				logMe("exportSmsInDb contentProvider:" + contentProvider);
+			private void exportInDb() {
+				logMe("exportInDb contentProvider:" + contentProvider);
 				List<ContentProviderData> data = manager.getList();
 
 				try {
-					service.deleteAll();
+					service.recreateTable();
 				} catch (SQLiteException e) {
 					logMe(e);
 				}

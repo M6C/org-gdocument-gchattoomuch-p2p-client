@@ -46,4 +46,15 @@ public class DbSmsCacheService extends GenericService<Sms> {
     		dbDataSource.close();
     	}
 	}
+
+	public void recreateTable() {
+    	try {
+    		dbDataSource.open();
+    		// Delete in database
+			dbDataSource.recreateTable();
+    	}
+    	finally {
+    		dbDataSource.close();
+    	}
+	}
 }

