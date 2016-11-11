@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
 				}
 			}
 		};
-    	FactoryDialog.getInstance().buildOkCancelDialog(this, onClickOkListener, onClickCancelListener, R.string.app_name, R.string.text_start_export).show();
+    	FactoryDialog.getInstance().buildOkCancelDialog(this, onClickOkListener, onClickCancelListener, R.string.app_name_p2p_client, R.string.text_start_export).show();
 	}
 
 	@SuppressWarnings("unused")
